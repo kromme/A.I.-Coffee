@@ -1,4 +1,6 @@
-// assign pin num
+// assign pin numbers. The numbers on the side of the arduino.
+// these are connected to the buttons of the drinks.
+
 int coffee_pin = 3;
 int espresso_pin = 4;
 int capu_pin = 5;
@@ -9,9 +11,11 @@ int choco_pin = 8;
 
 // duration for output
 int time = 100;
+
 // initial command
 int command = 0;
 
+// set the mode of the pins to output, as we're going to send signals, not receive them.
 void setup() {
   pinMode(coffee_pin, OUTPUT);
   pinMode(espresso_pin, OUTPUT);
@@ -22,59 +26,63 @@ void setup() {
   Serial.begin(9600);
 }
 
+
 // The continuous loop
 void loop() {
-  //receive command
+  //receive command from the python script, via serial.
   if (Serial.available() > 0){
+    
     // read the value given by Python
     command = Serial.read();
 
     // execute the send_command function
     send_command(command);
    
+    // reset everything
+    reset();
   }
  reset();
 }
 
-
+// pauze function
 void pauze(){
-  delay(500);
+  pauze();
 }
 
 // functions for the alternatives. Activate the pin, wait X milliseconds, deactivate pin.
 void coffee(){
   digitalWrite(coffee_pin, HIGH);
-  delay(500);
+  pauze();
   digitalWrite(coffee_pin, LOW);
 }
 void espresso(){
   digitalWrite(espresso_pin, HIGH);
-  delay(500);
+  pauze();
   digitalWrite(espresso_pin, LOW);
 }
 void capu(){
   digitalWrite(capu_pin, HIGH);
-  delay(500);
+  pauze();
   digitalWrite(capu_pin, LOW);
 }
 void heetwater(){
   digitalWrite(heetwater_pin, HIGH);
-  delay(500);
+  pauze();
   digitalWrite(heetwater_pin, LOW);
 }
 void latte(){
   digitalWrite(latte_pin, HIGH);
-  delay(500);
+  pauze();
   digitalWrite(latte_pin, LOW);
 }
 void choco(){
   digitalWrite(choco_pin, HIGH);
-  delay(500);
+  pauze();
   digitalWrite(choco_pin, LOW);
 }
 
 
-// Reset all pins
+// create the reset function. Reset all pins
 void reset(){
   digitalWrite(coffee_pin, LOW);
   digitalWrite(espresso_pin, LOW);
