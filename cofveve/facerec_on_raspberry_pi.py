@@ -1,12 +1,12 @@
 
 #### -------------------------------------------------------------------------------------------------------- ####
 #### -------------------------------------------------------------------------------------------------------- ####
-#### -----			            _____              _____ ____  ______ ______ ______ ______ 				----- ####
-#### -----			     /\     |_   _|      _     / ____/ __ \|  ____|  ____|  ____|  ____|			----- ####
-#### -----			    /  \      | |      _| |_  | |   | |  | | |__  | |__  | |__  | |__   			----- ####
-#### -----			   / /\ \     | |     |_   _| | |   | |  | |  __| |  __| |  __| |  __|  			----- ####
-#### -----			  / ____ \ _ _| |_ _    |_|   | |___| |__| | |    | |    | |____| |____ 			----- ####
-#### -----			 /_/    \_(_)_____(_)          \_____\____/|_|    |_|    |______|______|			----- ####
+#### -----                  _____              _____ ____  ______ ______ ______ ______ 		    	----- ####
+#### -----          /\     |_   _|      _     / ____/ __ \|  ____|  ____|  ____|  ____|			----- ####
+#### -----         /  \      | |      _| |_  | |   | |  | | |__  | |__  | |__  | |__   			----- ####
+#### -----        / /\ \     | |     |_   _| | |   | |  | |  __| |  __| |  __| |  __|  			----- ####
+#### -----       / ____ \ _ _| |_ _    |_|   | |___| |__| | |    | |    | |____| |____ 			----- ####
+#### -----      /_/    \_(_)_____(_)          \_____\____/|_|    |_|    |______|______|			----- ####
 #### -------------------------------------------------------------------------------------------------------- ####
 #### -------------------------------------------------------------------------------------------------------- ####
  
@@ -39,12 +39,12 @@ from pygame import mixer
 
 
 # ------ set parameters
-database_path = '/home/pi/cofveve/db.csv'
+database_path = '/home/pi/A.I.-Coffee/cofveve/db.csv'
 serial_path = '/dev/ttyACM0'
-image_list_path = 'image_list_db.pickle'
-image_names_path = 'image_names.pickle' 
-intro_sound_path = '/home/pi/Sounds/koffietijd.mp3'
-cascade_path = '/home/pi/cascades/haarcascade_frontalface_alt2.xml' 
+image_list_path = '/home/pi/A.I.-Coffee/cofveve/image_list_db.pickle'
+image_names_path = '/home/pi/A.I.-Coffee/cofveve/image_names.pickle' 
+intro_sound_path = '/home/pi/A.I.-Coffee/Sounds/koffietijd.mp3'
+cascade_path = '/home/pi/A.I.-Coffee/cascades/haarcascade_frontalface_alt2.xml' 
 
 
 # ------ initialize camera
@@ -64,7 +64,6 @@ print ("Initializing Coffee Machine..")
 print ("")
 ser = serial.Serial(serial_path, 9600)
 ser.timeout=3
-
 
 # ------ Load faces we want to recognize
 print("Loading known face image(s)")
@@ -123,12 +122,9 @@ while True:
         face_encodings = face_recognition.face_encodings(output, face_locations)
         face_names = []
 
-        # try to create distances between found face and the earlier loaded faces.
-        try:
-            face_distances = face_recognition.face_distance(image_list, face_encodings[0])
-        except:
-            pass
-        
+        # NOT NECESSARY: try to create distances between found face and the earlier loaded faces.
+        # face_distances = face_recognition.face_distance(image_list, face_encodings[0])
+       
         # Loop over each face found in the frame to see if it's someone we know.
         for face_encoding in face_encodings:
             
@@ -141,7 +137,6 @@ while True:
                 continue
             
             # get name of the match
-            print(match)
             name = (list(compress(image_names,match))[0])
             print(name)
 
@@ -153,7 +148,7 @@ while True:
             
             # check the beverage
             beverage = bytes(df[df.who == name.lower()].beverage.values[0],'UTF-8').decode('UTF-8')
-           	strong = int(df[df.who == name.lower()].strong)
+            strong = int(df[df.who == name.lower()].strong)
             
             print('Drinks %s, strongness: %s' %( str(beverage), str(strong)))
             

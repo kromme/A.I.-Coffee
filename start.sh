@@ -1,0 +1,1 @@
+python3 -i /home/pi/A.I.-Coffee/cofveve/facerec_on_raspberry_pi.py

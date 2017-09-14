@@ -9,7 +9,6 @@ import cv2
 import pandas as pd
 import serial
 import speech_recognition as sr
-from play_sound_function import *
 from itertools import compress
 from gtts import gTTS
 from time import sleep
