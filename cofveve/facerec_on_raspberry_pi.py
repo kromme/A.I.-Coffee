@@ -1,3 +1,19 @@
+
+#### -------------------------------------------------------------------------------------------------------- ####
+#### -------------------------------------------------------------------------------------------------------- ####
+#### -----			            _____              _____ ____  ______ ______ ______ ______ 				----- ####
+#### -----			     /\     |_   _|      _     / ____/ __ \|  ____|  ____|  ____|  ____|			----- ####
+#### -----			    /  \      | |      _| |_  | |   | |  | | |__  | |__  | |__  | |__   			----- ####
+#### -----			   / /\ \     | |     |_   _| | |   | |  | |  __| |  __| |  __| |  __|  			----- ####
+#### -----			  / ____ \ _ _| |_ _    |_|   | |___| |__| | |    | |    | |____| |____ 			----- ####
+#### -----			 /_/    \_(_)_____(_)          \_____\____/|_|    |_|    |______|______|			----- ####
+#### -------------------------------------------------------------------------------------------------------- ####
+#### -------------------------------------------------------------------------------------------------------- ####
+ 
+
+__author__ = ['j.schooneman', 't.stalman','k.tjepkema','j.v.d.leegte','w.v.d.geest','j.kromme']
+__description__ = 'Script running on raspberry pi, which is connected to a coffee machine. It integrates face recognition for automatic coffee dispention'
+
 # This is a demo of running face recognition on a Raspberry Pi.
 # This program will print out the names of anyone it recognizes to the console.
 
@@ -6,23 +22,32 @@
 # You can follow this installation instructions to get your RPi set up:
 # https://gist.github.com/ageitgey/1ac8dbe8572f3f533df6269dab35df65
 
+# ------ import packages
 import face_recognition
+import time, os, glob, pickle
 import picamera
 import numpy as np
-import glob
 import cv2
-import pandas
+import pandas as pd
 import serial
-import time
-from itertools import compress
-import pickle
-from play_sound_function import *
 import speech_recognition as sr
+from helper_functions import brew, play_sound
+from itertools import compress
 from gtts import gTTS
 from time import sleep
-import os
 from pygame import mixer
 
+
+# ------ set parameters
+database_path = '/home/pi/cofveve/db.csv'
+serial_path = '/dev/ttyACM0'
+image_list_path = 'image_list_db.pickle'
+image_names_path = 'image_names.pickle' 
+intro_sound_path = '/home/pi/Sounds/koffietijd.mp3'
+cascade_path = '/home/pi/cascades/haarcascade_frontalface_alt2.xml' 
+
+
+# ------ initialize camera
 # Get a reference to the Raspberry Pi camera.
 # If this fails, make sure you have a camera connected to the RPi and that you
 # enabled your camera in raspi-config and rebooted first.
@@ -30,79 +55,48 @@ camera = picamera.PiCamera()
 camera.resolution = (320, 240)
 output = np.empty((240, 320, 3), dtype=np.uint8)
 
+# ------ loading database with who wants which coffee
 print ('Loading database')
-df = pandas.read_csv('/home/pi/cofveve/db.csv', index_col=False, sep = ';')
+df = pd.read_csv(database_path, index_col=False, sep = ';')
 
-
+# ------ connect to the serial to the arduino.
 print ("Initializing Coffee Machine..")
 print ("")
-ser = serial.Serial('/dev/ttyACM0', 9600)
+ser = serial.Serial(serial_path, 9600)
 ser.timeout=3
 
-# play intro sound
 
-filename = '/home/pi/Sounds/koffietijd.mp3'
-   
-mixer.init()
-mixer.music.load(filename)
-mixer.music.play()
-
-
-
-
-
-def brew(beverage, strong = 0):
-    beverages = ['coffee', 'cafecreme', 'cafelait', 'cappu', 'espresso', 'doubleEspresso', 'hotchoc', 'hotwater']
-    # check if beverage is known
-    if beverage not in beverages:
-            print ('choose one of the following: ', ', '.join(beverages))
-            return False
-
-    # check strongness
-    if strong < -1 or strong > 1:
-            print ('choose strong (1), weak (-1) or normal (0)')
-            return False
-
-    # set weaker beverage
-    if strong == -1:
-            ser.write('9'.encode())
-            time.sleep(1.5)
-            #print (ser.readline())
-
-    if strong == 1:
-            ser.write('0'.encode())
-            time.sleep(1.5)
-            #print (ser.readline())
-
-    # brew beverage
-    ser.write(str(beverages.index(beverage)+1).encode())
-    time.sleep(1.5)
-
-    return (ser.readline())
-
-# Load faces we want to recognize
+# ------ Load faces we want to recognize
 print("Loading known face image(s)")
 
-
-with open('image_list_db.pickle' , 'rb' ) as f:
+with open(image_list_path , 'rb' ) as f:
     image_list = pickle.load( f)
 
-with open('image_names.pickle' , 'rb' ) as f:
+with open(image_names_path, 'rb' ) as f:
     image_names = pickle.load( f)
     
+
+# ------ play intro sound
+mixer.init()
+mixer.music.load(intro_sound_path)
+mixer.music.play()
 
 
 # Initialize some variables
 face_locations = []
 face_encodings = []
 face_names = []
-# cascade file
-cascPath = '/home/pi/cascades/haarcascade_frontalface_alt2.xml' 
-faceCascade = cv2.CascadeClassifier(cascPath)
 
+# ------- load cascade file
+faceCascade = cv2.CascadeClassifier(cascade_path)
+
+
+
+# ------ start the loop
 while True:
 
     print("Capturing image.")
+
     # Grab a single frame of video from the RPi camera as a numpy array
     camera.capture(output, format="rgb")
 
@@ -116,16 +110,20 @@ while True:
     )
 
     # print the current status of the program
-    print ("Found " + str(len(faces)) + " faces at position(s): " + str(faces))
+    print ("Found %d faces at position(s): %s" %( len(faces), str(faces)))
 
+    # if there are faces detected
     if(len(faces) > 0):
        
-        # Find all the faces and face encodings in the current frame of video
+        # Find all the faces in the current frame of video
         face_locations = face_recognition.face_locations(output)
         print("Found {} faces in image.".format(len(face_locations)))
+
+        # get encodings
         face_encodings = face_recognition.face_encodings(output, face_locations)
         face_names = []
 
+        # try to create distances between found face and the earlier loaded faces.
         try:
             face_distances = face_recognition.face_distance(image_list, face_encodings[0])
         except:
@@ -133,34 +131,38 @@ while True:
         
         # Loop over each face found in the frame to see if it's someone we know.
         for face_encoding in face_encodings:
+            
             # See if the face is a match for the known face(s)
             match = face_recognition.compare_faces(image_list, face_encoding)
 
+            # if we don't have a match, end this iteration. Go in the new loop.
             if True not in match:
                 print ("je bent lelijk van dichtbij. Neem jij maar rattengif")
                 continue
             
+            # get name of the match
             print(match)
             name = (list(compress(image_names,match))[0])
             print(name)
 
-            #play sound
+            # play sound that belongs with this name.
             play_sound(name)
             
             result = ''
             strong = 0
-            who = name.lower()
-
             
-            beverage = bytes(df[df.who == who].beverage.values[0],'UTF-8').decode('UTF-8')
+            # check the beverage
+            beverage = bytes(df[df.who == name.lower()].beverage.values[0],'UTF-8').decode('UTF-8')
+           	strong = int(df[df.who == name.lower()].strong)
             
-            print(beverage)
-            strong = int(df[df.who == who].strong)
+            print('Drinks %s, strongness: %s' %( str(beverage), str(strong)))
             
+            # if we've got a drink, brew it
             while len(result) == 0:
 
                     result = brew(beverage, strong)
                     print (result)
                     print ('')
 
+            # wait 25 seconds for the new loop.
             time.sleep(25)
