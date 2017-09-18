@@ -39,12 +39,16 @@ from pygame import mixer
 
 
 # ------ set parameters
-database_path = '/home/pi/A.I.-Coffee/cofveve/db.csv'
+working_directory = '/home/pi/A.I.-Coffee/'
+database_path = working_directory + 'cofveve/db.csv'
 serial_path = '/dev/ttyACM0'
-image_list_path = '/home/pi/A.I.-Coffee/cofveve/image_list_db.pickle'
-image_names_path = '/home/pi/A.I.-Coffee/cofveve/image_names.pickle' 
-intro_sound_path = '/home/pi/A.I.-Coffee/Sounds/koffietijd.mp3'
-cascade_path = '/home/pi/A.I.-Coffee/cascades/haarcascade_frontalface_alt2.xml' 
+image_list_path = working_directory + 'cofveve/image_list_db.pickle'
+image_names_path = working_directory + 'cofveve/image_names.pickle' 
+intro_sound_path = working_directory + 'Sounds/koffietijd.mp3'
+face_cascade_path = working_directory + 'cascades/haarcascade_frontalface_alt2.xml' 
+middle_finger_cascade_path =  working_directory + 'cascades/middlefinger_19.xml'
+
+
 
 
 # ------ initialize camera
@@ -87,8 +91,8 @@ face_encodings = []
 face_names = []
 
 # ------- load cascade file
-faceCascade = cv2.CascadeClassifier(cascade_path)
-
+faceCascade = cv2.CascadeClassifier(face_cascade_path)
+middleFingerCascade = cv2.CascadeClassifier(middle_finger_cascade_path)
 
 
 # ------ start the loop
@@ -108,8 +112,20 @@ while True:
                 flags = cv2.CASCADE_SCALE_IMAGE
     )
 
+
+    # detect middlefingers
+    middleFingers = middleFingerCascade.detectMultiScale(
+                output,
+                scaleFactor = 1.1,
+                minNeighbors = 5,
+                minSize = (30, 30),
+                flags = cv2.CASCADE_SCALE_IMAGE
+    )
+
+
+
     # print the current status of the program
-    print ("Found %d faces at position(s): %s" %( len(faces), str(faces)))
+    print ("Found %d faces at position(s): %s & %d middel fingers at position(s): %s" %( len(faces), str(faces), len(middleFingers), str(middleFingers)))
 
     # if there are faces detected
     if(len(faces) > 0):
@@ -161,3 +177,32 @@ while True:
 
             # wait 25 seconds for the new loop.
             time.sleep(25)
+    
+    # if it can't find face, but it does find middle fingers
+    elif (len(middleFingers) > 0):
+
+    	result = ''
+        strong = 0
+        beverage = 'espresso'
+        
+        # play a sound
+        # play_sound('middlefinger')
+    	
+    	# brew an espresso
+    	while len(result) == 0:
+
+            result = brew(beverage, strong)
+            print (result)
+            print ('first espresso')
+        
+        # wait till done
+        time.sleep(15)
+
+        # brew a second espresso to make it a double
+        result = ''
+        while len(result) == 0:
+            result = brew(beverage, strong)
+            print (result)
+            print ('second espresso')
+
+        time.sleep(25)
