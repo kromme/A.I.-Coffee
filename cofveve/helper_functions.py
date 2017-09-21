@@ -31,7 +31,7 @@ def play_sound(name):
                  'klaas':'Zwakkeling.mp3' }
 
     # sound path
-    sound_path = '/home/pi/Sounds/'
+    sound_path = '/home/pi/A.I.-Coffee/Sounds/'
 
     # get sound. if not in database, get default.
     if name in sounds_db.keys():

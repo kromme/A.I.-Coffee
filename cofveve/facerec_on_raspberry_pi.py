@@ -48,7 +48,7 @@ intro_sound_path = working_directory + 'Sounds/koffietijd.mp3'
 face_cascade_path = working_directory + 'cascades/haarcascade_frontalface_alt2.xml' 
 middle_finger_cascade_path =  working_directory + 'cascades/middlefinger_19.xml'
 
-
+with_preview = True
 
 
 # ------ initialize camera
@@ -58,6 +58,11 @@ middle_finger_cascade_path =  working_directory + 'cascades/middlefinger_19.xml'
 camera = picamera.PiCamera()
 camera.resolution = (320, 240)
 output = np.empty((240, 320, 3), dtype=np.uint8)
+
+if with_preview:
+    camera.start_preview()
+    camera.preview_fullscreen = False
+    camera.preview_window=(620,320,640,480)
 
 # ------ loading database with who wants which coffee
 print ('Loading database')
@@ -96,9 +101,13 @@ middleFingerCascade = cv2.CascadeClassifier(middle_finger_cascade_path)
 
 
 # ------ start the loop
-while True:
+image_ix = 0
 
-    print("Capturing image.")
+
+while True:
+    image_ix += 1
+
+    print("Capturing image: %d" % image_ix)
 
     # Grab a single frame of video from the RPi camera as a numpy array
     camera.capture(output, format="rgb")
@@ -125,10 +134,34 @@ while True:
 
 
     # print the current status of the program
-    print ("Found %d faces at position(s): %s & %d middel fingers at position(s): %s" %( len(faces), str(faces), len(middleFingers), str(middleFingers)))
+    print ("Found %d faces at position(s): %s & %d middle fingers at position(s): %s" %( len(faces), str(faces), len(middleFingers), str(middleFingers)))
+
+    # if middle finger detected
+    if (len(middleFingers) > 0):
+        result = ''
+        strong = 0
+        beverage = 'espresso'
+
+        while (len(result) == 0):
+            result = brew(beverage, strong)
+            print (result)
+            print ('first espresso')
+        
+        # wait till done
+        time.sleep(15)
+
+        # brew a second espresso to make it a double
+        result = ''
+        while len(result) == 0:
+            result = brew(beverage, strong)
+            print (result)
+            print ('second espresso')
+
+        time.sleep(25)
+
 
     # if there are faces detected
-    if(len(faces) > 0):
+    elif(len(faces) > 0):
        
         # Find all the faces in the current frame of video
         face_locations = face_recognition.face_locations(output)
@@ -178,31 +211,4 @@ while True:
             # wait 25 seconds for the new loop.
             time.sleep(25)
     
-    # if it can't find face, but it does find middle fingers
-    elif (len(middleFingers) > 0):
-
-    	result = ''
-        strong = 0
-        beverage = 'espresso'
-        
-        # play a sound
-        # play_sound('middlefinger')
-    	
-    	# brew an espresso
-    	while len(result) == 0:
-
-            result = brew(beverage, strong)
-            print (result)
-            print ('first espresso')
-        
-        # wait till done
-        time.sleep(15)
-
-        # brew a second espresso to make it a double
-        result = ''
-        while len(result) == 0:
-            result = brew(beverage, strong)
-            print (result)
-            print ('second espresso')
-
-        time.sleep(25)
+camera.stop_preview()
