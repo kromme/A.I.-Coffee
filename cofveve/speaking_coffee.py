@@ -10,7 +10,7 @@ while True:
     
     # Record audio
     r = sr.Recognizer()
-    with sr.Microphone() as source:
+    with sr.Microphone(device_index=2, sample_rate = 48000) as source:
         print("Say something!")
         audio = r.listen(source)
      
@@ -25,21 +25,3 @@ while True:
     # print the recognized text
     if 'tekst' in locals():
         print(tekst)
-    
-    # write the text that has to be spoken to an mp3 file
-    tts = gTTS(text='Do you feel like cappuccino? Computer says no! Take a double shot espresso', lang='en')
-    filename = "D:/Documents/Python/test.mp3"
-    tts.save(filename)
-
-    # play the mp3 file
-    mixer.init()
-    mixer.music.load(filename)
-    mixer.music.play()
-    sleep(10)
-
-    # stop playing
-    mixer.music.stop()
-    mixer.quit()
-    
-    # delete the mp3 file
-    os.remove(filename)

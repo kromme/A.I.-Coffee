@@ -143,7 +143,7 @@ while True:
         beverage = 'espresso'
 
         while (len(result) == 0):
-            result = brew(beverage, strong)
+            result = brew(ser, beverage, strong)
             print (result)
             print ('first espresso')
         
@@ -153,7 +153,7 @@ while True:
         # brew a second espresso to make it a double
         result = ''
         while len(result) == 0:
-            result = brew(beverage, strong)
+            result = brew(ser, beverage, strong)
             print (result)
             print ('second espresso')
 
@@ -203,10 +203,23 @@ while True:
             
             # if we've got a drink, brew it
             while len(result) == 0:
+                #Speech recognition for possible intervention (eg. 'stop','no')
+                r = sr.Recognizer()
+                with sr.Microphone(device_index=2, sample_rate = 48000) as source:
+                    print("Say something!")
+                    audio = r.listen(source)
+                try:
+                    tekst = r.recognize_google(audio)
+                except sr.UnknownValueError:
+                    print("Google Speech Recognition could not understand audio")
+                except sr.RequestError as e:
+                    print("Could not request results from Google Speech Recognition service; {0}".format(e))
 
-                    result = brew(beverage, strong)
-                    print (result)
-                    print ('')
+                if 'stop' in tekst:
+                    
+                result = brew(ser, beverage, strong)
+                print (result)
+                print ('')
 
             # wait 25 seconds for the new loop.
             time.sleep(25)
