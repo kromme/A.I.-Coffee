@@ -78,12 +78,12 @@ def brew(beverage, strong = 0):
 
     # set weaker beverage
     elif strong == -1:
-            ser.write('9'.encode())
+            ser.write('0'.encode())
             time.sleep(1.5)
             #print (ser.readline())
 
     elif strong == 1:
-            ser.write('0'.encode())
+            ser.write('9'.encode())
             time.sleep(1.5)
             #print (ser.readline())
 
