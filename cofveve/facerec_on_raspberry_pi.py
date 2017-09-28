@@ -139,25 +139,16 @@ while True:
     # if middle finger detected
     if (len(middleFingers) > 0):
         result = ''
-        strong = 0
-        beverage = 'espresso'
+       
+        beverage = 'doubleEspresso'
 
         while (len(result) == 0):
-            result = brew(ser, beverage, strong)
+            result = brew(ser, beverage)
             print (result)
             print ('first espresso')
         
         # wait till done
         time.sleep(15)
-
-        # brew a second espresso to make it a double
-        result = ''
-        while len(result) == 0:
-            result = brew(ser, beverage, strong)
-            print (result)
-            print ('second espresso')
-
-        time.sleep(25)
 
 
     # if there are faces detected
@@ -193,13 +184,13 @@ while True:
             play_sound(name)
             
             result = ''
-            strong = 0
+           
             
             # check the beverage
             beverage = bytes(df[df.who == name.lower()].beverage.values[0],'UTF-8').decode('UTF-8')
-            strong = int(df[df.who == name.lower()].strong)
+            #strong = int(df[df.who == name.lower()].strong)
             
-            print('Drinks %s, strongness: %s' %( str(beverage), str(strong)))
+            print('Drinks %s' %( str(beverage)))
             
             # if we've got a drink, brew it
             while len(result) == 0:
@@ -217,7 +208,7 @@ while True:
 
                 if 'stop' in tekst:
                     
-                result = brew(ser, beverage, strong)
+                result = brew(ser, beverage)
                 print (result)
                 print ('')
 

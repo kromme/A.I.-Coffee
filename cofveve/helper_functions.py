@@ -58,7 +58,7 @@ def play_sound(name):
 
 
 
-def brew(ser, beverage, strong = 0):
+def brew(ser, beverage):
     '''
     Tell the coffee machine which beverage to brew
     '''
@@ -70,22 +70,6 @@ def brew(ser, beverage, strong = 0):
     if beverage not in beverages:
             print ('choose one of the following: ', ', '.join(beverages))
             return False
-
-    # check strongness
-    if strong < -1 or strong > 1:
-            print ('choose strong (1), weak (-1) or normal (0)')
-            return False
-
-    # set weaker beverage
-    elif strong == -1:
-            ser.write('0'.encode())
-            time.sleep(1.5)
-            #print (ser.readline())
-
-    elif strong == 1:
-            ser.write('9'.encode())
-            time.sleep(1.5)
-            #print (ser.readline())
 
     # brew beverage
     ser.write(str(beverages.index(beverage)+1).encode())
