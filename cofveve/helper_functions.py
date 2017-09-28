@@ -58,7 +58,7 @@ def play_sound(name):
 
 
 
-def brew(beverage, strong = 0):
+def brew(ser, beverage, strong = 0):
     '''
     Tell the coffee machine which beverage to brew
     '''
