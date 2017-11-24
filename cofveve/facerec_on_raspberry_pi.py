@@ -1,4 +1,4 @@
-
+#!/bin/bash
 #### -------------------------------------------------------------------------------------------------------- ####
 #### -------------------------------------------------------------------------------------------------------- ####
 #### -----                  _____              _____ ____  ______ ______ ______ ______ 		    	----- ####
@@ -11,7 +11,7 @@
 #### -------------------------------------------------------------------------------------------------------- ####
  
 
-__author__ = ['j.schooneman', 't.stalman','k.tjepkema','j.v.d.leegte','w.v.d.geest','j.kromme']
+__author__ = ['j.schoonemann', 't.stalman','k.tjepkema','j.v.d.leegte','w.v.d.geest','j.kromme']
 __description__ = 'Script running on raspberry pi, which is connected to a coffee machine. It integrates face recognition for automatic coffee dispention'
 
 # This is a demo of running face recognition on a Raspberry Pi.
@@ -137,82 +137,73 @@ while True:
     print ("Found %d faces at position(s): %s & %d middle fingers at position(s): %s" %( len(faces), str(faces), len(middleFingers), str(middleFingers)))
 
     # if middle finger detected
-    if (len(middleFingers) > 0):
-        result = ''
-       
-        beverage = 'doubleEspresso'
-
-        while (len(result) == 0):
-            result = brew(ser, beverage)
-            print (result)
-            print ('first espresso')
-        
-        # wait till done
-        time.sleep(15)
-
-
-    # if there are faces detected
-    elif(len(faces) > 0):
-       
-        # Find all the faces in the current frame of video
-        face_locations = face_recognition.face_locations(output)
-        print("Found {} faces in image.".format(len(face_locations)))
-
-        # get encodings
-        face_encodings = face_recognition.face_encodings(output, face_locations)
-        face_names = []
-
-        # NOT NECESSARY: try to create distances between found face and the earlier loaded faces.
-        # face_distances = face_recognition.face_distance(image_list, face_encodings[0])
-       
-        # Loop over each face found in the frame to see if it's someone we know.
-        for face_encoding in face_encodings:
-            
-            # See if the face is a match for the known face(s)
-            match = face_recognition.compare_faces(image_list, face_encoding)
-
-            # if we don't have a match, end this iteration. Go in the new loop.
-            if True not in match:
-                print ("je bent lelijk van dichtbij. Neem jij maar rattengif")
-                continue
-            
-            # get name of the match
-            name = (list(compress(image_names,match))[0])
-            print(name)
-
-            # play sound that belongs with this name.
-            play_sound(name)
-            
+    try:
+        if (len(middleFingers) > 0):
             result = ''
            
+            beverage = 'doubleEspresso'
+            print(y)
+            while (len(result) == 0):
+                result = brew(ser, beverage)
+                print (result)
+                print ('double espresso')
             
-            # check the beverage
-            beverage = bytes(df[df.who == name.lower()].beverage.values[0],'UTF-8').decode('UTF-8')
-            #strong = int(df[df.who == name.lower()].strong)
-            
-            print('Drinks %s' %( str(beverage)))
-            
-            # if we've got a drink, brew it
-            while len(result) == 0:
-                #Speech recognition for possible intervention (eg. 'stop','no')
-                r = sr.Recognizer()
-                with sr.Microphone(device_index=2, sample_rate = 48000) as source:
-                    print("Say something!")
-                    audio = r.listen(source)
-                try:
-                    tekst = r.recognize_google(audio)
-                except sr.UnknownValueError:
-                    print("Google Speech Recognition could not understand audio")
-                except sr.RequestError as e:
-                    print("Could not request results from Google Speech Recognition service; {0}".format(e))
+            # wait till done
+            time.sleep(15)
 
-                if 'stop' in tekst:
-                    
+
+        # if there are faces detected
+        elif(len(faces) > 0):
+           
+            # Find all the faces in the current frame of video
+            face_locations = face_recognition.face_locations(output)
+            print("Found {} faces in image.".format(len(face_locations)))
+
+            # get encodings
+            face_encodings = face_recognition.face_encodings(output, face_locations)
+            face_names = []
+
+            # NOT NECESSARY: try to create distances between found face and the earlier loaded faces.
+            # face_distances = face_recognition.face_distance(image_list, face_encodings[0])
+           
+            # Loop over each face found in the frame to see if it's someone we know.
+            for face_encoding in face_encodings:
+                
+                # See if the face is a match for the known face(s)
+                match = face_recognition.compare_faces(image_list, face_encoding)
+
+                # if we don't have a match, end this iteration. Go in the new loop.
+                if True not in match:
+                    print ("je bent lelijk van dichtbij. Neem jij maar rattengif")
+                    continue
+                
+                # get name of the match
+                name = (list(compress(image_names,match))[0])
+                print(name)
+
+                # play sound that belongs with this name.
+                play_sound(name)
+                
+                result = ''
+               
+                
+                # check the beverage
+                beverage = bytes(df[df.who == name.lower()].beverage.values[0],'UTF-8').decode('UTF-8')
+                #strong = int(df[df.who == name.lower()].strong)
+                
+                print('Drinks %s' %( str(beverage)))
+                
+                
+                        
                 result = brew(ser, beverage)
                 print (result)
                 print ('')
 
-            # wait 25 seconds for the new loop.
-            time.sleep(25)
-    
+                # wait 25 seconds for the new loop.
+                time.sleep(25)
+
+    except:
+        print('oeps, ik geloof dat er iets mis is')
+        #camera.stop_preview()
+   
 camera.stop_preview()
