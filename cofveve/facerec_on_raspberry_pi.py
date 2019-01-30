@@ -9,7 +9,8 @@
 #### -----      /_/    \_(_)_____(_)          \_____\____/|_|    |_|    |______|______|			----- ####
 #### -------------------------------------------------------------------------------------------------------- ####
 #### -------------------------------------------------------------------------------------------------------- ####
- 
+
+print('nog even geduld a.u.b.')
 
 __author__ = ['j.schoonemann', 't.stalman','k.tjepkema','j.v.d.leegte','w.v.d.geest','j.kromme']
 __description__ = 'Script running on raspberry pi, which is connected to a coffee machine. It integrates face recognition for automatic coffee dispention'

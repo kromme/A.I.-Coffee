@@ -1,9 +1,9 @@
 who;beverage;strong
 jeanine;hotwater;0
-thomas;coffee;1
+thomas;coffee;0
 jeroen;espresso;0
-joost;hotchoc;1
-willem;hotchoc;-1
+joost;espresso;0
+willem;espresso;0
 wouter;espresso;0
 kees;coffee;0
 luc;coffee;0
@@ -19,7 +19,7 @@ marjolein;cappuccino;0
 marijke;cappuccino;0
 tino;cappuccino;0
 marion;hotwater;0
-klaas;cappu;1
-kjeld;coffee;1
+klaas;cappu;0
+kjeld;coffee;0
 peter;coffee;0
 koen;coffee;0

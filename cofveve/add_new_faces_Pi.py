@@ -6,6 +6,7 @@ Created on Fri Oct 20 13:50:19 2017
 @author: w.v.d.geest
 script om foto's in te scannen als tbv face recognition
 """
+print('op zoek naar nieuwe gezichten')
 
 import os
 import face_recognition
@@ -20,10 +21,10 @@ face_encodings = []
 face_names = []
 
 pictures = os.listdir(location_faces)
-print(pictures)
+#print(pictures)
 names_list_old = pickle.load( open(location_pickles+'image_names.pickle', "rb") )
 pictures_without_jpg = []
-print(names_list_old)
+#print(names_list_old)
 #remove .jpg from names_list_old > create names_list_old_without_jpg
 for i in range(0, len(pictures)):
     picture_without_jpg = pictures[i].replace(".jpg", "")
@@ -31,7 +32,7 @@ for i in range(0, len(pictures)):
 
 new_faces = set(pictures_without_jpg) - set(names_list_old)
 new_faces = list(new_faces)
-print(new_faces)
+#print(new_faces)
 #i = 0
 
 try:
@@ -65,3 +66,5 @@ try:
 
 except:
     print('oeps, er is iets mis gegaan met het verwerken van de nieuwe foto´s')
+
+print('alle gezichten zijn geladen')
