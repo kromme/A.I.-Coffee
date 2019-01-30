@@ -37,7 +37,7 @@ from itertools import compress
 from gtts import gTTS
 from time import sleep
 from pygame import mixer
-
+from order_coffee import *
 
 # ------ set parameters
 working_directory = '/home/pi/A.I.-Coffee/'
@@ -203,8 +203,13 @@ while True:
                 # wait 25 seconds for the new loop.
                 time.sleep(25)
 
-    except:
         print('oeps, ik geloof dat er iets mis is')
         #camera.stop_preview()
+
+    # check whether Willy has sent a request
+    willy_df = check_coffee_added_to_willy_database()
+    if willy_df:
+        brew_coffee(willy_df)
    
+
 camera.stop_preview()
