@@ -6,7 +6,7 @@ import datetime
 scope = ['https://spreadsheets.google.com/feeds',
          'https://www.googleapis.com/auth/drive']
 
-credentials = ServiceAccountCredentials.from_json_keyfile_name('drive_client_secret.json', scope)
+credentials = ServiceAccountCredentials.from_json_keyfile_name('../../drive_client_secret.json', scope)
 
 gsheet = gspread.authorize(credentials)
 gsheet = gsheet.open("virtual-assistant-coffee-link").sheet1
