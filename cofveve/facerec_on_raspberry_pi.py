@@ -203,13 +203,11 @@ while True:
                 # wait 25 seconds for the new loop.
                 time.sleep(25)
 
-        print('oeps, ik geloof dat er iets mis is')
-        #camera.stop_preview()
+         print('oeps, ik geloof dat er iets mis is')
+         #camera.stop_preview()
 
     # check whether Willy has sent a request
-    willy_df = check_coffee_added_to_willy_database()
-    if willy_df:
-        brew_coffee(willy_df)
-   
-
+    #willy_df=check_coffee_added_to_willy_database()
+    #if willy_df:
+    #    brew_coffee(willy_df)
 camera.stop_preview()
