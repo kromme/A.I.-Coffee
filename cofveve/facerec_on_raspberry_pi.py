@@ -23,6 +23,7 @@ __description__ = 'Script running on raspberry pi, which is connected to a coffe
 # You can follow this installation instructions to get your RPi set up:
 # https://gist.github.com/ageitgey/1ac8dbe8572f3f533df6269dab35df65
 
+
 # ------ import packages
 import face_recognition
 import time, os, glob, pickle
@@ -202,12 +203,32 @@ while True:
                 # wait 25 seconds for the new loop.
                 time.sleep(25)
 
-        print('oeps, ik geloof dat er iets mis is')
+        
         #camera.stop_preview()
     except:
+        print('oeps, ik geloof dat er iets mis is')
         continue
+    
     # check whether Willy has sent a request
-    willy_df=check_coffee_added_to_willy_database()
-    if willy_df:
-        brew_coffee(willy_df)
+    if image_ix % 10 == 0:
+        print('checking whether Willy ordered coffee for one of his beautiful colleagues')
+        willy_id=check_coffee_added_to_willy_database()
+        if willy_id:
+            print('Willy order {}'.format(willy_id))
+
+            willy_df = get_willy_database_for_coffee()
+            # determine drink
+            willy_drink = willy_df[(willy_df.finished.astype(str) == "0") & (willy_df.id.astype(str) == str(willy_id))].coffee.values[0]
+            willy_drink = willy_drink.lower()
+            if willy_drink in ['coffee', 'espresso', 'hotchoc', 'cappu	', 'hotwater']:
+                print('Willy ordered {}'.format(willy_drink))
+            
+                # brew the drink
+                result = brew(ser, willy_drink)
+                print (result)
+                print ('')
+            else:
+                print('{} not found'.format(willy_drink))
+                # update database
+            update_coffee_from_willy_database(willy_id)
 camera.stop_preview()

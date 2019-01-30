@@ -2,11 +2,13 @@ import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 import pandas as pd
 import datetime
+from helper_functions import *
 
 scope = ['https://spreadsheets.google.com/feeds',
          'https://www.googleapis.com/auth/drive']
 
-credentials = ServiceAccountCredentials.from_json_keyfile_name('../../drive_client_secret.json', scope)
+credentials_path ='/home/pi/drive_client_secret.json'
+credentials = ServiceAccountCredentials.from_json_keyfile_name(credentials_path, scope)
 
 gsheet = gspread.authorize(credentials)
 gsheet = gsheet.open("virtual-assistant-coffee-link").sheet1
@@ -46,34 +48,31 @@ def add_coffee_to_willy_database(drink):
 
 def update_coffee_from_willy_database(id):
 	# find cell
-	cell_list = gsheet.findall(id)
-	
-	# get cell row
-	row = cell_list[0].row
-
+	df = get_willy_database_for_coffee()
+	row = len(df) + 1
 	# update the finished column in the row with a 1
 	gsheet.update_cell(row, 4, 1)
 
 
 
-def brew_coffee(id):
+#def brew_coffee(id):
 	# 
-	df = get_willy_database_for_coffee()
+#	df = get_willy_database_for_coffee()
+#
+#	# determine drink
+#	drink = df[(df.finished.astype(str) == "0") & (df.id.astype(str) == str(id))].coffee.values[0]
+#	drink = drink.lower()
+#
+#	if not drink in ['coffee', 'espresso', 'hotchoc', 'cappuccino', 'hotwater']:
+#		print('{} not found, order something else'.format(drink))
+#		return False
 
-	# determine drink
-	drink = df[(df.finished.astype(str) == "0") & (df.id.astype(str) == str(id))].coffee.values[0]
-	drink = drink.lower()
+#	# brew the drink
+#	result = brew(ser, drink)
+#	print (result)
+#	print ('')
 
-	if not drink in ['coffee', 'espresso', 'hotchoc', 'cappuccino', 'hotwater']:
-		print('{} not found, order something else'.format(drink))
-		return False
-
-	# brew the drink
-	result = brew(ser, drink)
-	print (result)
-	print ('')
-
-	# update database
-	update_coffee_from_willy_database(id)
-	return result
+#	# update database
+#	update_coffee_from_willy_database(id)
+#	return result
 
